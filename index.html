@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Splitter</title>
+    <style>
+        /* Global styles */
+        :root {
+            --primary-color: #ff5722;
+            --secondary-color: #03a9f4;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #dddddd;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            margin: 0;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #e64a19;
+        }
+        
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        button.secondary:hover {
+            background-color: #0288d1;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        /* Split options */
+        .split-options {
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .split-option-equal, .split-option-percentage, .split-option-exact {
+            display: none;
+        }
+        
+        /* Split members checkboxes */
+        .split-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .split-members .member-checkbox {
+            display: flex;
+            align-items: center;
+        }
+        
+        .split-members .member-checkbox input[type="checkbox"] {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        /* Percentage inputs */
+        .percentage-inputs, .exact-inputs {
+            margin-top: 10px;
+        }
+        
+        .percentage-input-row, .exact-input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .percentage-input-row label, .exact-input-row label {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .percentage-input-row input, .exact-input-row input {
+            width: 80px;
+            margin-left: 10px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .tab:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Summary badges */
+        .summary-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .receives {
+            background-color: #e6f7ee;
+            color: #0c7a4d;
+        }
+        
+        .owes {
+            background-color: #fcede9;
+            color: #b73220;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Expense Splitter</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="members">Group Members</div>
+            <div class="tab" data-tab="expenses">Expenses</div>
+            <div class="tab" data-tab="summary">Summary</div>
+        </div>
+        
+        <div class="tab-content active" id="members-tab">
+            <div class="card">
+                <h2>Group Members</h2>
+                <div class="form-group">
+                    <label for="member-name">Name</label>
+                    <input type="text" id="member-name" placeholder="Enter member name">
+                </div>
+                <button id="add-member">Add Member</button>
+                
+                <h3>Current Members</h3>
+                <table id="members-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-list">
+                        <!-- Members will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="expenses-tab">
+            <div class="card">
+                <h2>Add Expense</h2>
+                <div class="form-group">
+                    <label for="expense-description">Description</label>
+                    <input type="text" id="expense-description" placeholder="e.g. Dinner, Groceries, Rent">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-amount">Amount</label>
+                    <input type="number" id="expense-amount" placeholder="0.00" min="0" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-payer">Paid by</label>
+                    <select id="expense-payer">
+                        <option value="">Select who paid</option>
+                        <!-- Payers will be added here -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="expense-date">Date</label>
+                    <input type="date" id="expense-date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="split-type">Split Type</label>
+                    <select id="split-type">
+                        <option value="equal">Equal</option>
+                        <option value="percentage">By Percentage</option>
+                        <option value="exact">Exact Amounts</option>
+                    </select>
+                </div>
+                
+                <div class="split-options">
+                    <div class="form-group">
+                        <label>Split with</label>
+                        <div class="split-members" id="split-members-list">
+                            <!-- Members checkboxes will be added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="split-option-equal">
+                        <!-- No additional fields for equal split -->
+                    </div>
+                    
+                    <div class="split-option-percentage">
+                        <div class="percentage-inputs" id="percentage-inputs">
+                            <!-- Percentage inputs will be added here -->
+                        </div>
+                        <p>Total: <span id="percentage-total">0</span>%</p>
+                    </div>
+                    
+                    <div class="split-option-exact">
+                        <div class="exact-inputs" id="exact-inputs">
+                            <!-- Exact amount inputs will be added here -->
+                        </div>
+                        <p>Total: $<span id="exact-total">0.00</span> (Remaining: $<span id="exact-remaining">0.00</span>)</p>
+                    </div>
+                </div>
+                
+                <button id="add-expense">Add Expense</button>
+            </div>
+            
+            <div class="card">
+                <h2>Expense History</h2>
+                <table id="expenses-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Paid by</th>
+                            <th>Split</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenses-list">
+                        <!-- Expenses will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="summary-tab">
+            <div class="card">
+                <h2>Balance Summary</h2>
+                <div id="balances-summary">
+                    <!-- Balance summary will be shown here -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Settlement Plan</h2>
+                <p>The simplest way to settle all debts:</p>
+                <div id="settlement-plan">
+                    <!-- Settlement transactions will be shown here -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Individual Breakdown</h2>
+                <div id="individual-breakdown">
+                    <!-- Individual breakdown will be shown here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global app variable for access from HTML events
+        let app;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the app
+            app = {
+                members: [],
+                expenses: [],
+                activeTab: 'members',
+                
+                init: function() {
+                    this.loadFromLocalStorage();
+                    this.renderMembers();
+                    this.renderExpensePayers();
+                    this.renderSplitMembers();
+                    this.renderExpenses();
+                    this.updateSummary();
+                    this.setupEventListeners();
+                },
+                
+                setupEventListeners: function() {
+                    // Tab navigation
+                    document.querySelectorAll('.tab').forEach(tab => {
+                        tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                    });
+                    
+                    // Members tab
+                    document.getElementById('add-member').addEventListener('click', () => this.addMember());
+                    
+                    // Expenses tab
+                    document.getElementById('split-type').addEventListener('change', () => this.updateSplitOptions());
+                    document.getElementById('expense-amount').addEventListener('input', () => this.updateSplitAmounts());
+                    document.getElementById('add-expense').addEventListener('click', () => this.addExpense());
+                    
+                    // Update split members when members change
+                    document.getElementById('split-members-list').addEventListener('change', (e) => {
+                        if (e.target.type === 'checkbox') {
+                            this.updateSplitInputs();
+                        }
+                    });
+                },
+                
+                // Storage functions
+                saveToLocalStorage: function() {
+                    localStorage.setItem('expenseSplitterMembers', JSON.stringify(this.members));
+                    localStorage.setItem('expenseSplitterExpenses', JSON.stringify(this.expenses));
+                },
+                
+                loadFromLocalStorage: function() {
+                    const members = localStorage.getItem('expenseSplitterMembers');
+                    const expenses = localStorage.getItem('expenseSplitterExpenses');
+                    
+                    if (members) {
+                        this.members = JSON.parse(members);
+                    }
+                    
+                    if (expenses) {
+                        this.expenses = JSON.parse(expenses);
+                    }
+                },
+                
+                // Tab functions
+                switchTab: function(tabId) {
+                    this.activeTab = tabId;
+                    
+                    // Update tab buttons
+                    document.querySelectorAll('.tab').forEach(tab => {
+                        tab.classList.remove('active');
+                        if (tab.dataset.tab === tabId) {
+                            tab.classList.add('active');
+                        }
+                    });
+                    
+                    // Update tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId + '-tab').classList.add('active');
+                    
+                    // Refresh the appropriate tab content
+                    if (tabId === 'expenses') {
+                        this.renderExpensePayers();
+                        this.renderSplitMembers();
+                    } else if (tabId === 'summary') {
+                        this.updateSummary();
+                    }
+                },
+                
+                // Member functions
+                addMember: function() {
+                    const nameInput = document.getElementById('member-name');
+                    const name = nameInput.value.trim();
+                    
+                    if (name) {
+                        const memberId = 'member_' + Date.now();
+                        this.members.push({
+                            id: memberId,
+                            name: name
+                        });
+                        
+                        this.saveToLocalStorage();
+                        this.renderMembers();
+                        this.renderExpensePayers();
+                        this.renderSplitMembers();
+                        
+                        nameInput.value = '';
+                    }
+                },
+                
+                removeMember: function(memberId) {
+                    // Check if member has expenses first
+                    const hasExpenses = this.expenses.some(expense => {
+                        return expense.payer === memberId || expense.splits.some(split => split.memberId === memberId);
+                    });
+                    
+                    if (hasExpenses) {
+                        alert('Cannot remove this member because they are involved in one or more expenses. Remove the expenses first.');
+                        return;
+                    }
+                    
+                    this.members = this.members.filter(member => member.id !== memberId);
+                    this.saveToLocalStorage();
+                    this.renderMembers();
+                    this.renderExpensePayers();
+                    this.renderSplitMembers();
+                },
+                
+                renderMembers: function() {
+                    const membersList = document.getElementById('members-list');
+                    membersList.innerHTML = '';
+                    
+                    if (this.members.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="2">No members added yet</td>';
+                        membersList.appendChild(row);
+                        return;
+                    }
+                    
+                    this.members.forEach(member => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${member.name}</td>
+                            <td>
+                                <button class="secondary" onclick="app.removeMember('${member.id}')">Remove</button>
+                            </td>
+                        `;
+                        membersList.appendChild(row);
+                    });
+                },
+                
+                renderExpensePayers: function() {
+                    const payerSelect = document.getElementById('expense-payer');
+                    const currentValue = payerSelect.value;
+                    
+                    payerSelect.innerHTML = '<option value="">Select who paid</option>';
+                    
+                    this.members.forEach(member => {
+                        const option = document.createElement('option');
+                        option.value = member.id;
+                        option.textContent = member.name;
+                        payerSelect.appendChild(option);
+                    });
+                    
+                    // Restore previous value if possible
+                    if (currentValue && this.members.some(m => m.id === currentValue)) {
+                        payerSelect.value = currentValue;
+                    }
+                },
+                
+                renderSplitMembers: function() {
+                    const splitMembersList = document.getElementById('split-members-list');
+                    splitMembersList.innerHTML = '';
+                    
+                    this.members.forEach(member => {
+                        const checkbox = document.createElement('div');
+                        checkbox.className = 'member-checkbox';
+                        checkbox.innerHTML = `
+                            <input type="checkbox" id="split-${member.id}" data-member-id="${member.id}" checked>
+                            <label for="split-${member.id}">${member.name}</label>
+                        `;
+                        splitMembersList.appendChild(checkbox);
+                    });
+                    
+                    this.updateSplitInputs();
+                },
+                
+                // Expense functions
+                updateSplitOptions: function() {
+                    const splitType = document.getElementById('split-type').value;
+                    const splitOptions = document.querySelector('.split-options');
+                    
+                    // Show split options if there are members
+                    if (this.members.length > 0) {
+                        splitOptions.style.display = 'block';
+                    } else {
+                        splitOptions.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Hide all split type specific options
+                    document.querySelector('.split-option-equal').style.display = 'none';
+                    document.querySelector('.split-option-percentage').style.display = 'none';
+                    document.querySelector('.split-option-exact').style.display = 'none';
+                    
+                    // Show the selected split type options
+                    document.querySelector(`.split-option-${splitType}`).style.display = 'block';
+                    
+                    this.updateSplitInputs();
+                },
+                
+                updateSplitInputs: function() {
+                    const splitType = document.getElementById('split-type').value;
+                    const selectedMembers = this.getSelectedSplitMembers();
+                    
+                    if (splitType === 'percentage') {
+                        this.renderPercentageInputs(selectedMembers);
+                    } else if (splitType === 'exact') {
+                        this.renderExactInputs(selectedMembers);
+                    }
+                    
+                    this.updateSplitAmounts();
+                },
+                
+                renderPercentageInputs: function(selectedMembers) {
+                    const percentageInputs = document.getElementById('percentage-inputs');
+                    percentageInputs.innerHTML = '';
+                    
+                    if (selectedMembers.length === 0) {
+                        percentageInputs.innerHTML = '<p>Select at least one member to split with</p>';
+                        return;
+                    }
+                    
+                    const defaultPercentage = Math.floor(100 / selectedMembers.length);
+                    let remainingPercentage = 100 - (defaultPercentage * (selectedMembers.length - 1));
+                    
+                    selectedMembers.forEach((member, index) => {
+                        const isLast = index === selectedMembers.length - 1;
+                        const percentValue = isLast ? remainingPercentage : defaultPercentage;
+                        
+                        const row = document.createElement('div');
+                        row.className = 'percentage-input-row';
+                        row.innerHTML = `
+                            <label for="percent-${member.id}">${member.name}</label>
+                            <input type="number" id="percent-${member.id}" 
+                                data-member-id="${member.id}" 
+                                value="${percentValue}" min="0" max="100"
+                                oninput="app.updateSplitAmounts()">
+                        `;
+                        percentageInputs.appendChild(row);
+                    });
+                },
+                
+                renderExactInputs: function(selectedMembers) {
+                    const exactInputs = document.getElementById('exact-inputs');
+                    exactInputs.innerHTML = '';
+                    
+                    if (selectedMembers.length === 0) {
+                        exactInputs.innerHTML = '<p>Select at least one member to split with</p>';
+                        return;
+                    }
+                    
+                    const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+                    const defaultAmount = amount / selectedMembers.length;
+                    
+                    selectedMembers.forEach(member => {
+                        const row = document.createElement('div');
+                        row.className = 'exact-input-row';
+                        row.innerHTML = `
+                            <label for="exact-${member.id}">${member.name}</label>
+                            <input type="number" id="exact-${member.id}" 
+                                data-member-id="${member.id}" 
+                                value="${defaultAmount.toFixed(2)}" min="0" step="0.01"
+                                oninput="app.updateSplitAmounts()">
+                        `;
+                        exactInputs.appendChild(row);
+                    });
+                },
+                
+                updateSplitAmounts: function() {
+                    const splitType = document.getElementById('split-type').value;
+                    
+                    if (splitType === 'percentage') {
+                        let total = 0;
+                        document.querySelectorAll('#percentage-inputs input').forEach(input => {
+                            total += parseFloat(input.value) || 0;
+                        });
+                        document.getElementById('percentage-total').textContent = total.toFixed(2);
+                    } else if (splitType === 'exact') {
+                        const amount = parseFloat(document.getElementById('expense-amount').value) || 0;
+                        let total = 0;
+                        document.querySelectorAll('#exact-inputs input').forEach(input => {
+                            total += parseFloat(input.value) || 0;
+                        });
+                        document.getElementById('exact-total').textContent = total.toFixed(2);
+                        document.getElementById('exact-remaining').textContent = (amount - total).toFixed(2);
+                    }
+                },
+                
+                getSelectedSplitMembers: function() {
+                    const selectedMembers = [];
+                    document.querySelectorAll('#split-members-list input:checked').forEach(checkbox => {
+                        const memberId = checkbox.dataset.memberId;
+                        const member = this.members.find(m => m.id === memberId);
+                        if (member) {
+                            selectedMembers.push(member);
+                        }
+                    });
+                    return selectedMembers;
+                },
+                
+                addExpense: function() {
+                    const description = document.getElementById('expense-description').value.trim();
+                    const amount = parseFloat(document.getElementById('expense-amount').value);
+                    const payer = document.getElementById('expense-payer').value;
+                    const dateInput = document.getElementById('expense-date').value;
+                    const date = dateInput ? dateInput : new Date().toISOString().split('T')[0];
+                    const splitType = document.getElementById('split-type').value;
+                    
+                    if (!description) {
+                        alert('Please enter a description');
+                        return;
+                    }
+                    
+                    if (!amount || amount <= 0) {
+                        alert('Please enter a valid amount');
+                        return;
+                    }
+                    
+                    if (!payer) {
+                        alert('Please select who paid');
+                        return;
+                    }
+                    
+                    const selectedMembers = this.getSelectedSplitMembers();
+                    if (selectedMembers.length === 0) {
+                        alert('Please select at least one member to split with');
+                        return;
+                    }
+                    
+                    // Calculate splits based on split type
+                    const splits = [];
+                    if (splitType === 'equal') {
+                        const splitAmount = amount / selectedMembers.length;
+                        selectedMembers.forEach(member => {
+                            splits.push({
+                                memberId: member.id,
+                                amount: splitAmount
+                            });
+                        });
+                    } else if (splitType === 'percentage') {
+                        let totalPercent = 0;
+                        const percentages = {};
+                        
+                        document.querySelectorAll('#percentage-inputs input').forEach(input => {
+                            const memberId = input.dataset.memberId;
+                            const percent = parseFloat(input.value) || 0;
+                            percentages[memberId] = percent;
+                            totalPercent += percent;
+                        });
+                        
+                        if (Math.abs(totalPercent - 100) > 0.01) {
+                            alert('Percentages must add up to 100%');
+                            return;
+                        }
+                        
+                        selectedMembers.forEach(member => {
+                            const percent = percentages[member.id] || 0;
+                            splits.push({
+                                memberId: member.id,
+                                amount: (amount * percent) / 100
+                            });
+                        });
+                    } else if (splitType === 'exact') {
+                        let totalExact = 0;
+                        const exactAmounts = {};
+                        
+                        document.querySelectorAll('#exact-inputs input').forEach(input => {
+                            const memberId = input.dataset.memberId;
+                            const exactAmount = parseFloat(input.value) || 0;
+                            exactAmounts[memberId] = exactAmount;
+                            totalExact += exactAmount;
+                        });
+                        
+                        if (Math.abs(totalExact - amount) > 0.01) {
+                            alert('Exact amounts must add up to the total expense amount');
+                            return;
+                        }
+                        
+                        selectedMembers.forEach(member => {
+                            splits.push({
+                                memberId: member.id,
+                                amount: exactAmounts[member.id] || 0
+                            });
+                        });
+                    }
+                    
+                    // Create and save the expense
+                    const expenseId = 'expense_' + Date.now();
+                    this.expenses.push({
+                        id: expenseId,
+                        description: description,
+                        amount: amount,
+                        payer: payer,
+                        date: date,
+                        splitType: splitType,
+                        splits: splits
+                    });
+                    
+                    this.saveToLocalStorage();
+                    this.renderExpenses();
+                    this.updateSummary();
+                    
+                    // Clear the form
+                    document.getElementById('expense-description').value = '';
+                    document.getElementById('expense-amount').value = '';
+                    document.getElementById('expense-date').value = '';
+                    
+                    // Switch to the expenses tab
+                    this.switchTab('expenses');
+                },
+                
+                removeExpense: function(expenseId) {
+                    this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
+                    this.saveToLocalStorage();
+                    this.renderExpenses();
+                    this.updateSummary();
+                },
+                
+                formatDate: function(dateString) {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                },
+                
+                renderExpenses: function() {
+                    const expensesList = document.getElementById('expenses-list');
+                    expensesList.innerHTML = '';
+                    
+                    if (this.expenses.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="6">No expenses added yet</td>';
+                        expensesList.appendChild(row);
+                        return;
+                    }
+                    
+                    // Sort expenses by date (newest first)
+                    const sortedExpenses = [...this.expenses].sort((a, b) => {
+                        return new Date(b.date) - new Date(a.date);
+                    });
+                    
+                    sortedExpenses.forEach(expense => {
+                        const payer = this.members.find(m => m.id === expense.payer);
+                        if (!payer) return;
+                        
+                        // Format split information
+                        const splitInfo = expense.splits.map(split => {
+                            const member = this.members.find(m => m.id === split.memberId);
+                            if (!member) return '';
+                            return `${member.name}: ${split.amount.toFixed(2)}`;
+                        }).join(', ');
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${expense.description}</td>
+                            <td>${this.formatDate(expense.date)}</td>
+                            <td>${expense.amount.toFixed(2)}</td>
+                            <td>${payer.name}</td>
+                            <td>${splitInfo}</td>
+                            <td>
+                                <button class="secondary" onclick="app.removeExpense('${expense.id}')">Remove</button>
+                            </td>
+                        `;
+                        expensesList.appendChild(row);
+                    });
