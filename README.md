@@ -63,10 +63,6 @@ npx serve
 3. Select the main branch as the source
 4. Your site will be published at `https://yourusername.github.io/expense-splitter/`
 
-#### Deploy to AWS S3
-
-See the [AWS deployment instructions](AWS-DEPLOYMENT.md) for detailed steps.
-
 ## How to Use
 
 ### 1. Add Group Members
