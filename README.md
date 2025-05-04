@@ -4,8 +4,6 @@ A lightweight, browser-based application for tracking shared expenses among frie
 
 Built by vibe coding using Claude 3.7 Sonnet.
 
-![Expense Splitter App](https://api/placeholder/800/400)
-
 ## Features
 
 - **Simple Group Management**: Add and remove group members easily
