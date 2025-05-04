@@ -411,41 +411,41 @@
                 activeTab: 'members',
                 
                 init: function() {
-                    this.loadFromLocalStorage();
-                    this.renderMembers();
-                    this.renderExpensePayers();
-                    this.renderSplitMembers();
-                    this.renderExpenses();
-                    this.updateSummary();
-                    this.setupEventListeners();
+                    loadFromLocalStorage();
+                    renderMembers();
+                    renderExpensePayers();
+                    renderSplitMembers();
+                    renderExpenses();
+                    updateSummary();
+                    setupEventListeners();
                 },
                 
                 setupEventListeners: function() {
                     // Tab navigation
                     document.querySelectorAll('.tab').forEach(tab => {
-                        tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+                        tab.addEventListener('click', () => switchTab(tab.dataset.tab));
                     });
                     
                     // Members tab
-                    document.getElementById('add-member').addEventListener('click', () => this.addMember());
+                    document.getElementById('add-member').addEventListener('click', () => addMember());
                     
                     // Expenses tab
-                    document.getElementById('split-type').addEventListener('change', () => this.updateSplitOptions());
-                    document.getElementById('expense-amount').addEventListener('input', () => this.updateSplitAmounts());
-                    document.getElementById('add-expense').addEventListener('click', () => this.addExpense());
+                    document.getElementById('split-type').addEventListener('change', () => updateSplitOptions());
+                    document.getElementById('expense-amount').addEventListener('input', () => updateSplitAmounts());
+                    document.getElementById('add-expense').addEventListener('click', () => addExpense());
                     
                     // Update split members when members change
                     document.getElementById('split-members-list').addEventListener('change', (e) => {
                         if (e.target.type === 'checkbox') {
-                            this.updateSplitInputs();
+                            updateSplitInputs();
                         }
                     });
                 },
                 
                 // Storage functions
                 saveToLocalStorage: function() {
-                    localStorage.setItem('expenseSplitterMembers', JSON.stringify(this.members));
-                    localStorage.setItem('expenseSplitterExpenses', JSON.stringify(this.expenses));
+                    localStorage.setItem('expenseSplitterMembers', JSON.stringify(members));
+                    localStorage.setItem('expenseSplitterExpenses', JSON.stringify(expenses));
                 },
                 
                 loadFromLocalStorage: function() {
@@ -453,17 +453,17 @@
                     const expenses = localStorage.getItem('expenseSplitterExpenses');
                     
                     if (members) {
-                        this.members = JSON.parse(members);
+                        members = JSON.parse(members);
                     }
                     
                     if (expenses) {
-                        this.expenses = JSON.parse(expenses);
+                        expenses = JSON.parse(expenses);
                     }
                 },
                 
                 // Tab functions
                 switchTab: function(tabId) {
-                    this.activeTab = tabId;
+                    activeTab = tabId;
                     
                     // Update tab buttons
                     document.querySelectorAll('.tab').forEach(tab => {
@@ -481,10 +481,10 @@
                     
                     // Refresh the appropriate tab content
                     if (tabId === 'expenses') {
-                        this.renderExpensePayers();
-                        this.renderSplitMembers();
+                        renderExpensePayers();
+                        renderSplitMembers();
                     } else if (tabId === 'summary') {
-                        this.updateSummary();
+                        updateSummary();
                     }
                 },
                 
@@ -495,15 +495,15 @@
                     
                     if (name) {
                         const memberId = 'member_' + Date.now();
-                        this.members.push({
+                        members.push({
                             id: memberId,
                             name: name
                         });
                         
-                        this.saveToLocalStorage();
-                        this.renderMembers();
-                        this.renderExpensePayers();
-                        this.renderSplitMembers();
+                        saveToLocalStorage();
+                        renderMembers();
+                        renderExpensePayers();
+                        renderSplitMembers();
                         
                         nameInput.value = '';
                     }
@@ -511,7 +511,7 @@
                 
                 removeMember: function(memberId) {
                     // Check if member has expenses first
-                    const hasExpenses = this.expenses.some(expense => {
+                    const hasExpenses = expenses.some(expense => {
                         return expense.payer === memberId || expense.splits.some(split => split.memberId === memberId);
                     });
                     
@@ -520,25 +520,25 @@
                         return;
                     }
                     
-                    this.members = this.members.filter(member => member.id !== memberId);
-                    this.saveToLocalStorage();
-                    this.renderMembers();
-                    this.renderExpensePayers();
-                    this.renderSplitMembers();
+                    members = members.filter(member => member.id !== memberId);
+                    saveToLocalStorage();
+                    renderMembers();
+                    renderExpensePayers();
+                    renderSplitMembers();
                 },
                 
                 renderMembers: function() {
                     const membersList = document.getElementById('members-list');
                     membersList.innerHTML = '';
                     
-                    if (this.members.length === 0) {
+                    if (members.length === 0) {
                         const row = document.createElement('tr');
                         row.innerHTML = '<td colspan="2">No members added yet</td>';
                         membersList.appendChild(row);
                         return;
                     }
                     
-                    this.members.forEach(member => {
+                    members.forEach(member => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${member.name}</td>
@@ -556,7 +556,7 @@
                     
                     payerSelect.innerHTML = '<option value="">Select who paid</option>';
                     
-                    this.members.forEach(member => {
+                    members.forEach(member => {
                         const option = document.createElement('option');
                         option.value = member.id;
                         option.textContent = member.name;
@@ -564,7 +564,7 @@
                     });
                     
                     // Restore previous value if possible
-                    if (currentValue && this.members.some(m => m.id === currentValue)) {
+                    if (currentValue && members.some(m => m.id === currentValue)) {
                         payerSelect.value = currentValue;
                     }
                 },
@@ -573,7 +573,7 @@
                     const splitMembersList = document.getElementById('split-members-list');
                     splitMembersList.innerHTML = '';
                     
-                    this.members.forEach(member => {
+                    members.forEach(member => {
                         const checkbox = document.createElement('div');
                         checkbox.className = 'member-checkbox';
                         checkbox.innerHTML = `
@@ -583,7 +583,7 @@
                         splitMembersList.appendChild(checkbox);
                     });
                     
-                    this.updateSplitInputs();
+                    updateSplitInputs();
                 },
                 
                 // Expense functions
@@ -592,7 +592,7 @@
                     const splitOptions = document.querySelector('.split-options');
                     
                     // Show split options if there are members
-                    if (this.members.length > 0) {
+                    if (members.length > 0) {
                         splitOptions.style.display = 'block';
                     } else {
                         splitOptions.style.display = 'none';
@@ -607,20 +607,20 @@
                     // Show the selected split type options
                     document.querySelector(`.split-option-${splitType}`).style.display = 'block';
                     
-                    this.updateSplitInputs();
+                    updateSplitInputs();
                 },
                 
                 updateSplitInputs: function() {
                     const splitType = document.getElementById('split-type').value;
-                    const selectedMembers = this.getSelectedSplitMembers();
+                    const selectedMembers = getSelectedSplitMembers();
                     
                     if (splitType === 'percentage') {
-                        this.renderPercentageInputs(selectedMembers);
+                        renderPercentageInputs(selectedMembers);
                     } else if (splitType === 'exact') {
-                        this.renderExactInputs(selectedMembers);
+                        renderExactInputs(selectedMembers);
                     }
                     
-                    this.updateSplitAmounts();
+                    updateSplitAmounts();
                 },
                 
                 renderPercentageInputs: function(selectedMembers) {
@@ -702,7 +702,7 @@
                     const selectedMembers = [];
                     document.querySelectorAll('#split-members-list input:checked').forEach(checkbox => {
                         const memberId = checkbox.dataset.memberId;
-                        const member = this.members.find(m => m.id === memberId);
+                        const member = members.find(m => m.id === memberId);
                         if (member) {
                             selectedMembers.push(member);
                         }
@@ -733,7 +733,7 @@
                         return;
                     }
                     
-                    const selectedMembers = this.getSelectedSplitMembers();
+                    const selectedMembers = getSelectedSplitMembers();
                     if (selectedMembers.length === 0) {
                         alert('Please select at least one member to split with');
                         return;
@@ -798,7 +798,7 @@
                     
                     // Create and save the expense
                     const expenseId = 'expense_' + Date.now();
-                    this.expenses.push({
+                    expenses.push({
                         id: expenseId,
                         description: description,
                         amount: amount,
@@ -808,9 +808,9 @@
                         splits: splits
                     });
                     
-                    this.saveToLocalStorage();
-                    this.renderExpenses();
-                    this.updateSummary();
+                    saveToLocalStorage();
+                    renderExpenses();
+                    updateSummary();
                     
                     // Clear the form
                     document.getElementById('expense-description').value = '';
@@ -818,14 +818,14 @@
                     document.getElementById('expense-date').value = '';
                     
                     // Switch to the expenses tab
-                    this.switchTab('expenses');
+                    switchTab('expenses');
                 },
                 
                 removeExpense: function(expenseId) {
-                    this.expenses = this.expenses.filter(expense => expense.id !== expenseId);
-                    this.saveToLocalStorage();
-                    this.renderExpenses();
-                    this.updateSummary();
+                    expenses = expenses.filter(expense => expense.id !== expenseId);
+                    saveToLocalStorage();
+                    renderExpenses();
+                    updateSummary();
                 },
                 
                 formatDate: function(dateString) {
@@ -841,7 +841,7 @@
                     const expensesList = document.getElementById('expenses-list');
                     expensesList.innerHTML = '';
                     
-                    if (this.expenses.length === 0) {
+                    if (expenses.length === 0) {
                         const row = document.createElement('tr');
                         row.innerHTML = '<td colspan="6">No expenses added yet</td>';
                         expensesList.appendChild(row);
@@ -849,17 +849,17 @@
                     }
                     
                     // Sort expenses by date (newest first)
-                    const sortedExpenses = [...this.expenses].sort((a, b) => {
+                    const sortedExpenses = [...expenses].sort((a, b) => {
                         return new Date(b.date) - new Date(a.date);
                     });
                     
                     sortedExpenses.forEach(expense => {
-                        const payer = this.members.find(m => m.id === expense.payer);
+                        const payer = members.find(m => m.id === expense.payer);
                         if (!payer) return;
                         
                         // Format split information
                         const splitInfo = expense.splits.map(split => {
-                            const member = this.members.find(m => m.id === split.memberId);
+                            const member = members.find(m => m.id === split.memberId);
                             if (!member) return '';
                             return `${member.name}: ${split.amount.toFixed(2)}`;
                         }).join(', ');
@@ -867,7 +867,7 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${expense.description}</td>
-                            <td>${this.formatDate(expense.date)}</td>
+                            <td>${formatDate(expense.date)}</td>
                             <td>${expense.amount.toFixed(2)}</td>
                             <td>${payer.name}</td>
                             <td>${splitInfo}</td>
