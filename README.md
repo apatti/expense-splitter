@@ -20,7 +20,7 @@ Built by vibe coding using Claude 3.7 Sonnet.
 
 ## Demo
 
-Access the live demo [here](#) (replace with your deployed URL).
+Access the live demo [here](https://apatti.github.io/expense-splitter/).
 
 ## Getting Started
 
